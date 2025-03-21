@@ -35,7 +35,7 @@ require('lazy').setup({
 
   require 'kickstart/plugins/cmp',
 
-  -- require 'kickstart/plugins/tokyonight',
+  require 'kickstart/plugins/tokyonight',
 
   require 'kickstart/plugins/todo-comments',
 
@@ -48,13 +48,15 @@ require('lazy').setup({
 
   require 'kickstart/plugins/comment-toggle',
 
-  require 'kickstart/plugins/gruvbox',
+  -- require 'kickstart/plugins/gruvbox',
 
   require 'kickstart/plugins/vimtex',
 
   require 'kickstart/plugins/surround',
 
-  require 'kickstart/plugins/auto-pairs',
+  require 'kickstart/plugins/autopairs',
+
+  require 'kickstart/plugins/indent_line',
 
   require 'kickstart/plugins/alpha-ui',
 }, {
