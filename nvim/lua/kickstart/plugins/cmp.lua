@@ -106,6 +106,8 @@ return {
             group_index = 0,
           },
           { name = 'nvim_lsp' },
+          { name = 'ltex' },
+          { name = 'texlab' },
           { name = 'luasnip' },
           { name = 'path' },
         },
