@@ -58,6 +58,8 @@ require('lazy').setup({
 
   require 'kickstart/plugins/indent_line',
 
+  require 'kickstart/plugins/dap',
+
   require 'kickstart/plugins/alpha-ui',
 }, {
   ui = {
