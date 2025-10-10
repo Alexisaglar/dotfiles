@@ -44,7 +44,8 @@ require('lazy').setup({
   require 'kickstart/plugins/treesitter',
 
   -- CUSTOM ADDED
-  require 'kickstart/plugins/neo-tree',
+  --
+  -- require 'kickstart/plugins/neo-tree',
 
   require 'kickstart/plugins/comment-toggle',
 
