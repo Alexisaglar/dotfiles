@@ -10,8 +10,8 @@ italic = { family = "CaskaydiaMono Nerd Font", style = "Italic" }
 size = 14
 
 [window]
-padding.x = 5 
-padding.y = 5 
+padding.x = 10 
+padding.y = 10 
 decorations = "None"
 
 [keyboard]
