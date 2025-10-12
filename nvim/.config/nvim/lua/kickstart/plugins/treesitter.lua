@@ -4,7 +4,7 @@ return {
     build = ':TSUpdate',
     -- Use `opts` instead of `config`
     opts = {
-      ensure_installed = { 'lua', 'python', 'vim', 'vimdoc' }, -- Add any other languages you use
+      ensure_installed = { 'lua', 'python', 'vim', 'vimdoc', 'html' }, -- Add any other languages you use
       sync_install = false, -- Install parsers synchronously (blocks UI)
       auto_install = true, -- Automatically install parsers when entering a buffer
       highlight = {

@@ -47,6 +47,8 @@ require('lazy').setup({
   --
   -- require 'kickstart/plugins/neo-tree',
 
+  require 'kickstart/plugins/leetcode',
+
   require 'kickstart/plugins/comment-toggle',
 
   -- require 'kickstart/plugins/gruvbox',
