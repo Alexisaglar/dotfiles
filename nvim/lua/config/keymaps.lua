@@ -53,3 +53,9 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     vim.highlight.on_yank()
   end,
 })
+--
+-- Press <leader>b to compile and run
+vim.keymap.set('n', '<leader>b', function()
+    vim.cmd('write') -- Save the file first
+    vim.cmd('!cmake --build ../build && ../build/termbox_app')
+end, { desc = "Build and Run Termbox App" })

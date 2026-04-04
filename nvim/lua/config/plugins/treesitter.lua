@@ -2,8 +2,9 @@ return {
     {
         "nvim-treesitter/nvim-treesitter",
         build = ":TSUpdate",
+        lazy = false,
         opts = {
-          ensure_installed = { 'lua', 'python', 'vim', 'html', 'markdown', 'ruby' }, 
+          ensure_installed = { 'lua', 'python', 'c', 'vim', 'html', 'markdown', 'ruby' }, 
           sync_install = false, -- Install parsers synchronously (blocks UI)
           auto_install = true, -- Automatically install parsers when entering a buffer
           highlight = {
