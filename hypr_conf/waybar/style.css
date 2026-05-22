@@ -1,0 +1,52 @@
+* {
+    font-family: Hack, monospace;
+    font-size: 12px;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+    min-height: 0;
+}
+
+window#waybar {
+    background: #1a1a1a;
+    color: #ffffff;
+}
+
+#workspaces button {
+    padding: 0 6px;
+    color: #888888;
+    background: transparent;
+}
+
+#workspaces button.active {
+    color: #ffffff;
+    background: #4c7899;
+}
+
+#workspaces button.urgent {
+    color: #ffffff;
+    background: #900000;
+}
+
+#window {
+    padding: 0 8px;
+    color: #888888;
+}
+
+#pulseaudio,
+#network,
+#battery,
+#clock,
+#tray {
+    padding: 0 8px;
+    color: #bbbbbb;
+}
+
+#battery.charging {
+    color: #ffffff;
+}
+
+#battery.critical:not(.charging) {
+    color: #ff0000;
+}

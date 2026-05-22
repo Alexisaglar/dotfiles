@@ -1,0 +1,211 @@
+# ── MONITORS ──────────────────────────────────────────────────────────────────
+# Run `hyprctl monitors` to get your real output names after first boot.
+# Your i3 had HDMI-1-0 (primary/fm) and HDMI-1 (secondary/sm).
+# Laptop lid closed = disable built-in display.
+# monitor=eDP-1,disable
+# monitor=HDMI-A-2,preferred,1920x0,1       # primary   (was $fm / ws2-0)
+monitor=DP-3,preferred,1920x0,1       # secondary (was $sm / ws1)
+
+# ── AUTOSTART ─────────────────────────────────────────────────────────────────
+exec-once = swaybg -c 1a1a1a  
+# exec-once = hyprpaper 
+exec-once = waybar
+exec-once = nm-applet --indicator
+exec-once = dunst
+exec-once = swayidle -w timeout 300 'swaylock -c 000000' timeout 600 'hyprctl dispatch dpms off' resume 'hyprctl dispatch dpms on'
+
+# ── INPUT ─────────────────────────────────────────────────────────────────────
+input {
+    kb_layout = us
+    follow_mouse = 1
+    touchpad {
+        natural_scroll = true
+    }
+}
+
+# ── GENERAL — no gaps, thin borders, i3-like ──────────────────────────────────
+general {
+    gaps_in = 0
+    gaps_out = 0
+    border_size = 2
+    col.active_border = rgba(4c7899ff)    # same blue i3 uses by default
+    col.inactive_border = rgba(333333ff)
+    layout = dwindle
+}
+
+# ── DECORATION — no rounding, no blur ─────────────────────────────────────────
+decoration {
+    rounding = 0
+    blur {
+        enabled = false
+    }
+    shadow {
+        enabled = false
+    }
+}
+
+# ── ANIMATIONS — all off ──────────────────────────────────────────────────────
+animations {
+    enabled = false
+}
+
+# ── DWINDLE — i3-like binary splits ───────────────────────────────────────────
+# Dwindle behaves closest to i3's tiling model.
+dwindle {
+    pseudotile = false
+    preserve_split = true
+    force_split = 2          # always split to the right/bottom like i3
+}
+
+# ── WORKSPACE → MONITOR ASSIGNMENTS ──────────────────────────────────────────
+# Mirror your i3 setup: ws1 on secondary, rest on primary
+workspace = 1, monitor:HDMI-A-2, default:true
+workspace = 2, monitor:DP-3, default:true
+workspace = 3, monitor:DP-3
+workspace = 4, monitor:DP-3
+workspace = 5, monitor:DP-3
+workspace = 6, monitor:DP-3
+workspace = 7, monitor:DP-3
+workspace = 8, monitor:DP-3
+workspace = 9, monitor:DP-3
+workspace = 10, monitor:DP-3
+
+# ── VARIABLES ─────────────────────────────────────────────────────────────────
+$mod = ALT       # your i3 $mod was Mod1 = Alt
+$terminal = foot
+$menu = rofi -modi drun,run -show drun
+
+# ── KEYBINDS ──────────────────────────────────────────────────────────────────
+
+# Terminal
+bind = $mod, Return, exec, $terminal
+
+# Kill focused window  (Mod+Shift+Q)
+bind = $mod SHIFT, Q, killactive
+
+# App launcher  (Mod+D)
+bind = $mod, D, exec, $menu
+
+# Lock screen  (Ctrl+Mod+L)
+bind = CTRL $mod, L, exec, swaylock -c 000000
+
+# Reload config  (Mod+Shift+C)
+bind = $mod SHIFT, C, exec, hyprctl reload
+
+# Exit Hyprland  (Mod+Shift+E)
+bind = $mod SHIFT, E, exit
+
+# ── FOCUS (hjkl + arrows) ─────────────────────────────────────────────────────
+bind = $mod, H, movefocus, l
+bind = $mod, J, movefocus, d
+bind = $mod, K, movefocus, u
+bind = $mod, L, movefocus, r
+bind = $mod, left,  movefocus, l
+bind = $mod, down,  movefocus, d
+bind = $mod, up,    movefocus, u
+bind = $mod, right, movefocus, r
+
+# ── MOVE WINDOW (Shift+hjkl + arrows) ────────────────────────────────────────
+bind = $mod SHIFT, H, movewindow, l
+bind = $mod SHIFT, J, movewindow, d
+bind = $mod SHIFT, K, movewindow, u
+bind = $mod SHIFT, L, movewindow, r
+bind = $mod SHIFT, left,  movewindow, l
+bind = $mod SHIFT, down,  movewindow, d
+bind = $mod SHIFT, up,    movewindow, u
+bind = $mod SHIFT, right, movewindow, r
+
+# ── SPLIT DIRECTION (Mod+G horizontal, Mod+V vertical) ───────────────────────
+# In dwindle, togglesplit flips the split direction for the next window
+bind = $mod, G, layoutmsg, preselect r   # split right (horizontal)
+bind = $mod, V, layoutmsg, preselect d   # split down  (vertical)
+
+# ── FULLSCREEN (Mod+F) ────────────────────────────────────────────────────────
+bind = $mod, F, fullscreen, 0
+
+# ── FLOATING (Mod+Shift+Space toggle, Mod+Space focus toggle) ────────────────
+bind = $mod SHIFT, space, togglefloating
+bind = $mod, space, cyclenext           # closest to focus mode_toggle
+bindm = $mod, mouse:272, movewindow     # drag float with mod+left click
+bindm = $mod, mouse:273, resizewindow   # resize float with mod+right click
+
+# ── LAYOUT MODES ─────────────────────────────────────────────────────────────
+# i3 had stacking/tabbed — Hyprland doesn't have these natively.
+# Mod+S → pseudo (stacks window on top without splitting, closest equivalent)
+# Mod+E → toggle split direction (like i3's toggle split)
+bind = $mod, S, pseudo
+bind = $mod, E, layoutmsg, togglesplit
+# Mod+W has no direct equivalent; bind to something useful or leave unbound
+# bind = $mod, W, ...
+
+# ── FOCUS PARENT (Mod+A) ─────────────────────────────────────────────────────
+# No direct parent/child concept in dwindle, but this cycles focus
+bind = $mod, A, layoutmsg, focusmaster
+
+# ── WORKSPACES ────────────────────────────────────────────────────────────────
+bind = $mod, 1, workspace, 1
+bind = $mod, 2, workspace, 2
+bind = $mod, 3, workspace, 3
+bind = $mod, 4, workspace, 4
+bind = $mod, 5, workspace, 5
+bind = $mod, 6, workspace, 6
+bind = $mod, 7, workspace, 7
+bind = $mod, 8, workspace, 8
+bind = $mod, 9, workspace, 9
+bind = $mod, 0, workspace, 10
+
+bind = $mod SHIFT, 1, movetoworkspace, 1
+bind = $mod SHIFT, 2, movetoworkspace, 2
+bind = $mod SHIFT, 3, movetoworkspace, 3
+bind = $mod SHIFT, 4, movetoworkspace, 4
+bind = $mod SHIFT, 5, movetoworkspace, 5
+bind = $mod SHIFT, 6, movetoworkspace, 6
+bind = $mod SHIFT, 7, movetoworkspace, 7
+bind = $mod SHIFT, 8, movetoworkspace, 8
+bind = $mod SHIFT, 9, movetoworkspace, 9
+bind = $mod SHIFT, 0, movetoworkspace, 10
+
+# ── RESIZE MODE ───────────────────────────────────────────────────────────────
+# Hyprland uses submap instead of mode
+submap = resize
+bind = , H, resizeactive, -40 0
+bind = , J, resizeactive, 0 40
+bind = , K, resizeactive, 0 -40
+bind = , L, resizeactive, 40 0
+bind = , left,  resizeactive, -40 0
+bind = , down,  resizeactive, 0 40
+bind = , up,    resizeactive, 0 -40
+bind = , right, resizeactive, 40 0
+bind = , Return, submap, reset
+bind = , Escape, submap, reset
+bind = $mod, R,  submap, reset
+submap = reset
+bind = $mod, R, submap, resize
+
+# ── AUDIO (your Mod+F1/F2/F3) ────────────────────────────────────────────────
+bind = $mod, F1, exec, pactl set-sink-mute @DEFAULT_SINK@ toggle
+bind = $mod, F2, exec, pactl set-sink-volume @DEFAULT_SINK@ -5%
+bind = $mod, F3, exec, pactl set-sink-volume @DEFAULT_SINK@ +5%
+
+# ── MEDIA (your Mod+F8/F9/F10) ───────────────────────────────────────────────
+bind = $mod, F8,  exec, playerctl previous
+bind = $mod, F9,  exec, playerctl play-pause
+bind = $mod, F10, exec, playerctl next
+
+# ── BRIGHTNESS (your Mod+F5/F6) ──────────────────────────────────────────────
+bind = $mod, F5, exec, brightnessctl set 5%-
+bind = $mod, F6, exec, brightnessctl set +5%
+
+# ── SCREENSHOTS ───────────────────────────────────────────────────────────────
+# Replaces maim+xdotool+xclip with grim+slurp+wl-copy (Wayland equivalents)
+bind = , Print,       exec, grim ~/Pictures/screenshot-$(date -u +'%Y%m%d-%H%M%SZ')-all.png
+bind = $mod, Print,   exec, grim -g "$(slurp -o)" ~/Pictures/screenshot-$(date -u +'%Y%m%d-%H%M%SZ')-current.png
+bind = SHIFT, Print,  exec, grim -g "$(slurp)" ~/Pictures/screenshot-$(date -u +'%Y%m%d-%H%M%SZ')-selected.png
+bind = CTRL, Print,        exec, grim - | wl-copy
+bind = CTRL $mod, Print,   exec, grim -g "$(slurp -o)" - | wl-copy
+bind = CTRL SHIFT, Print,  exec, grim -g "$(slurp)" - | wl-copy
+
+# ── LAPTOP LID ────────────────────────────────────────────────────────────────
+# When lid closes, disable internal display. Requires logind.
+bindl = , switch:on:Lid Switch,  exec, hyprctl keyword monitor "eDP-1,disable"
+bindl = , switch:off:Lid Switch, exec, hyprctl keyword monitor "eDP-1,preferred,auto,1"

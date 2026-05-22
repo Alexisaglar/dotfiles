@@ -1,0 +1,17 @@
+color=1a1a1a
+indicator-idle-visible
+indicator-radius=80
+indicator-thickness=6
+ring-color=4c7899
+ring-ver-color=4c7899
+ring-wrong-color=ff5555
+ring-clear-color=333333
+inside-color=1a1a1a
+inside-ver-color=1a1a1a
+inside-wrong-color=1a1a1a
+line-color=00000000
+text-color=ffffff
+text-ver-color=ffffff
+text-wrong-color=ffffff
+separator-color=00000000
+
