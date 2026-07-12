@@ -1,9 +1,25 @@
 #!/usr/bin/env bash
+
+### -------- GET WIFI ON LAPTOP FIRST --------
+# iwctl
+# device list
+# station wlan0 scan
+# station wlan0 get-networks
+# station wlan0 connect "Your-WiFi-Name"
+# exit
+# 
+# ping -c 3 google.com
+# 
+# curl -LO https://github.com/Alexisaglar/dotfiles/archlinux/arch_script.sh
+# chmod +x arch_script
+# ./arch_script
+
 set -e
 
-echo "=== Arch Linux + Hyprland Installer ==="
+echo "=== Arch Linux Installer ==="
 read -p "EFI partition (e.g. /dev/nvme0n1p1): " EFI
 read -p "ROOT partition (e.g. /dev/nvme0n1p2): " ROOT
+read -p "Hostname: " HOSTNAME 
 read -p "Username: " USER
 read -p "Full Name: " NAME
 read -sp "Password: " PASSWORD
@@ -12,6 +28,21 @@ read -p "Wi-Fi Network Name (SSID): " WIFI_SSID
 read -sp "Wi-Fi Password: " WIFI_PASS
 echo
 read -p "Git URL for your Dotfiles (e.g. https://github.com/user/repo.git): " DOTFILES_REPO
+echo
+echo "Which processor does this laptop have?"
+echo "1) Intel"
+echo "2) AMD"
+read -p "Select 1 or 2: " CPU_CHOICE
+
+if [ "$CPU_CHOICE" == "1" ]; then
+    UCODE="intel-ucode"
+    UCODE_IMG="/intel-ucode.img"
+    GPU_MODULE="i915"
+else
+    UCODE="amd-ucode"
+    UCODE_IMG="/amd-ucode.img"
+    GPU_MODULE="amdgpu"
+fi
 echo
 
 ### -------- FILESYSTEM --------
@@ -25,10 +56,10 @@ mount "$EFI" /mnt/boot
 ### -------- BASE ARCH & HYPRLAND ECOSYSTEM --------
 pacman -Syy --noconfirm archlinux-keyring
 
-# Combined base system and your specific graphical environment packages
+# Installing base system, correct microcode, Mesa (graphics), and Wayland tools
 pacstrap /mnt \
-base base-devel linux linux-headers linux-firmware \
-networkmanager vim git curl intel-ucode dkms \
+base base-devel linux linux-headers linux-firmware $UCODE mesa \
+networkmanager vim git curl dkms \
 zram-generator power-profiles-daemon bluez bluez-utils \
 pipewire wireplumber pipewire-alsa pipewire-pulse pulseaudio-utils \
 hyprland waybar rofi-wayland dunst hyprpaper swaybg \
@@ -49,23 +80,21 @@ useradd -m "$USER"
 usermod -c "$NAME" "$USER"
 usermod -aG wheel,video,audio,storage,power "$USER"
 echo "$USER:$PASSWORD" | chpasswd
-# Give wheel group sudo access
 sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 
 ### --- WIFI CONFIGURATION ---
-# Creates a NetworkManager profile so Wi-Fi connects on first boot
-cat <<'WIFI' > /etc/NetworkManager/system-connections/${WIFI_SSID}.nmconnection
+cat <<'WIFI' > /etc/NetworkManager/system-connections/\${WIFI_SSID}.nmconnection
 [connection]
-id=${WIFI_SSID}
+id=\${WIFI_SSID}
 type=wifi
 
 [wifi]
-ssid=${WIFI_SSID}
+ssid=\${WIFI_SSID}
 mode=infrastructure
 
 [wifi-security]
 key-mgmt=wpa-psk
-psk=${WIFI_PASS}
+psk=\${WIFI_PASS}
 
 [ipv4]
 method=auto
@@ -73,7 +102,7 @@ method=auto
 [ipv6]
 method=auto
 WIFI
-chmod 600 /etc/NetworkManager/system-connections/${WIFI_SSID}.nmconnection
+chmod 600 /etc/NetworkManager/system-connections/\${WIFI_SSID}.nmconnection
 
 ### --- LOCALE / TIME ---
 sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
@@ -83,11 +112,11 @@ ln -sf /usr/share/zoneinfo/Asia/Kathmandu /etc/localtime
 hwclock --systohc
 
 ### --- HOSTNAME ---
-echo "archlinux" > /etc/hostname
+echo "$HOSTNAME" > /etc/hostname
 cat <<HOSTS > /etc/hosts
 127.0.0.1 localhost
 ::1       localhost
-127.0.1.1 archlinux.localdomain archlinux
+127.0.1.1 ${HOSTNAME}.localdomain ${HOSTNAME}
 HOSTS
 
 ### --- ZRAM ---
@@ -107,23 +136,20 @@ sudo -u "$USER" makepkg -si --noconfirm
 cd /
 rm -rf /tmp/yay
 
-### --- DOTFILES SETUP ---
-# Clone your repo as the user
+### --- DOTFILES SETUP (SYMLINKS) ---
 sudo -u "$USER" git clone "$DOTFILES_REPO" "/home/$USER/dotfiles"
 
-# Create standard config directories
 sudo -u "$USER" mkdir -p "/home/$USER/.config/hypr"
 sudo -u "$USER" mkdir -p "/home/$USER/.config/waybar"
 
-# Copy the files explicitly to where Hyprland and Waybar expect them
-sudo -u "$USER" cp "/home/$USER/dotfiles/hyprland.conf" "/home/$USER/.config/hypr/hyprland.conf" || true
-sudo -u "$USER" cp "/home/$USER/dotfiles/hyprpaper.conf" "/home/$USER/.config/hypr/hyprpaper.conf" || true
-sudo -u "$USER" cp "/home/$USER/dotfiles/config" "/home/$USER/.config/waybar/config" || true
-sudo -u "$USER" cp "/home/$USER/dotfiles/style.css" "/home/$USER/.config/waybar/style.css" || true
+# Linking files instead of copying them
+sudo -u "$USER" ln -sf "/home/$USER/dotfiles/hyprland.conf" "/home/$USER/.config/hypr/hyprland.conf"
+sudo -u "$USER" ln -sf "/home/$USER/dotfiles/hyprpaper.conf" "/home/$USER/.config/hypr/hyprpaper.conf"
+sudo -u "$USER" ln -sf "/home/$USER/dotfiles/config" "/home/$USER/.config/waybar/config"
+sudo -u "$USER" ln -sf "/home/$USER/dotfiles/style.css" "/home/$USER/.config/waybar/style.css"
 
 ### --- MKINITCPIO ---
-# Standard modules for Intel/AMD
-sed -i 's/^MODULES=.*/MODULES=(i915)/' /etc/mkinitcpio.conf
+sed -i "s/^MODULES=.*/MODULES=($GPU_MODULE)/" /etc/mkinitcpio.conf
 sed -i 's/^HOOKS=.*/HOOKS=(systemd autodetect modconf kms keyboard sd-vconsole block filesystems fsck)/' /etc/mkinitcpio.conf
 mkinitcpio -P
 
@@ -139,7 +165,7 @@ LOADER
 cat <<ENTRY > /boot/loader/entries/arch.conf
 title   ArchLinux
 linux   /vmlinuz-linux
-initrd  /intel-ucode.img
+initrd  $UCODE_IMG
 initrd  /initramfs-linux.img
 options root=UUID=$ROOT_UUID rw quiet loglevel=3 rd.udev.log_level=3
 ENTRY
@@ -151,8 +177,13 @@ systemctl --global enable pipewire pipewire-pulse wireplumber
 echo "INSTALLATION COMPLETE"
 EOF
 
+# Pass the exported variables into the chroot environment so they resolve properly
+export WIFI_SSID
+export WIFI_PASS
+export GPU_MODULE
+export UCODE_IMG
+
 chmod +x /mnt/next.sh
 arch-chroot /mnt /next.sh
 rm /mnt/next.sh
 
-echo "DONE. You can reboot now."
