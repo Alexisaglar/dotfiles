@@ -1,0 +1,8 @@
+{
+  "plugins": {
+    "gruber-darker.nvim": {
+      "rev": "50fa4e583099729fcaaadc73a5afb74f7a91a625",
+      "src": "https://github.com/blazkowolf/gruber-darker.nvim"
+    }
+  }
+}
